@@ -14,37 +14,67 @@ const Login = () => {
   const router = useRouter(); // import { useRouter } from "expo-router"
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View className="flex-1 justify-center items-center bg-gray-50 p-6">
-        <View className="w-full bg-white/50 backdrop-blur-md rounded-2xl p-8 shadow-lg">
-          <Text className="text-3xl font-bold mb-6 text-center text-gray-900">
-            Login
-          </Text>
-          <TextInput
-            placeholder="email"
-            placeholderTextColor="#6B7280"
-            className="border bg-gray-300 p-3 mb-4 rounded-xl"
-          />
-          <TextInput
-            placeholder="password"
-            placeholderTextColor="#6B7280"
-            className="border bg-gray-300 p-3 mb-4 rounded-xl"
-          />
+      {/* Container: Clean off-white background */}
+      <View className="flex-1 justify-center items-center bg-slate-50 p-6">
+        
+        {/* Card: White card with softer, deeper shadows and larger rounding */}
+        <View className="w-full max-w-sm bg-white rounded-[32px] p-8 shadow-xl shadow-slate-200 border border-slate-100">
+          
+          {/* Header */}
+          <View className="mb-8">
+            <Text className="text-3xl font-extrabold text-slate-800 text-center">
+              Welcome Back
+            </Text>
+            <Text className="text-slate-500 text-center mt-2 font-medium">
+              Sign in to access your TODOs
+            </Text>
+          </View>
+
+          {/* Inputs: Lighter backgrounds, subtle borders, better padding */}
+          <View className="space-y-4">
+            <View>
+              <Text className="text-slate-600 font-semibold mb-2 ml-1">Email</Text>
+              <TextInput
+                placeholder="hello@example.com"
+                placeholderTextColor="#94a3b8"
+                className="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl text-slate-800 focus:border-indigo-500 focus:bg-white"
+              />
+            </View>
+
+            <View>
+              <Text className="text-slate-600 font-semibold mb-2 ml-1">Password</Text>
+              <TextInput
+                placeholder="••••••••"
+                placeholderTextColor="#94a3b8"
+                secureTextEntry={true} 
+                className="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl text-slate-800 focus:border-indigo-500 focus:bg-white mb-6"
+              />
+            </View>
+          </View>
+
+          {/* Login Button: Indigo gradient feel with shadow */}
           <Pressable
-            className="bg-blue-600/80 px-6 py-3 rounded-2xl"
+            className="bg-indigo-600 w-full py-4 rounded-2xl shadow-lg shadow-indigo-200 active:bg-indigo-700"
             onPress={() => {
               router.replace("/home");
             }}
           >
-            <Text className="text-white text-lg text-center">Login</Text>
+            <Text className="text-white text-lg font-bold text-center">
+              Log In
+            </Text>
           </Pressable>
-          <View className="flex-row justify-center mt-2">
-            <Text className="text-gray-700">Don't have an account? </Text>
+
+          {/* Footer */}
+          <View className="flex-row justify-center items-center mt-8 space-x-1">
+            <Text className="text-slate-500 font-medium">Don't have an account?</Text>
             <TouchableOpacity
               onPress={() => {
                 router.push("/register");
               }}
             >
-              <Text className="text-blue-600 font-semibold">Register</Text>
+              <Text className="text-indigo-600 font-bold text-base ml-1">
+                Register
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
