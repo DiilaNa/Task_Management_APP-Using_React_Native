@@ -10,11 +10,11 @@ import {
   query,
   updateDoc,
   where,
-} from 'firebase/firestore';
-import { db } from './firebase';
+} from "firebase/firestore";
+import { db } from "./firebase";
 
 const auth = getAuth();
-const tasksCollection = collection(db, 'tasks');
+const tasksCollection = collection(db, "tasks");
 
 export const addTask = async (
   title: string,
@@ -39,8 +39,8 @@ export const getAllTask = async () => {
 
   const q = query(
     tasksCollection,
-    where('userId', '==', user.uid),
-    orderBy('createdAt', 'desc')
+    where("userId", "==", user.uid),
+    orderBy("createdAt", "desc")
   );
 
   const snapshot = await getDocs(q);
@@ -56,29 +56,28 @@ export const getAllTask = async () => {
   });
 };
 
-
 // ---------------------------------------------------------
 
 export const getTaskById = async (id: string) => {
-  const user = auth.currentUser
-  if (!user) throw new Error('User not authenticated.')
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated.");
 
-  const ref = doc(db, 'tasks', id)
-  const taskDoc = await getDoc(ref)
+  const ref = doc(db, "tasks", id);
+  const taskDoc = await getDoc(ref);
 
-  if (!taskDoc.exists()) throw new Error('Task not found')
+  if (!taskDoc.exists()) throw new Error("Task not found");
 
-  const data = taskDoc.data()
-  if (data.userId !== user.uid) throw new Error('Unauthorized')
+  const data = taskDoc.data();
+  if (data.userId !== user.uid) throw new Error("Unauthorized");
 
   return {
     id: taskDoc.id,
-    title: data.title || '',
-    description: data.description || '',
+    title: data.title || "",
+    description: data.description || "",
     isComplete: data.isComplete || false,
-    createdAt: data.createdAt || ''
-  }
-}
+    createdAt: data.createdAt || "",
+  };
+};
 
 export const updateTask = async (
   id: string,
@@ -86,53 +85,77 @@ export const updateTask = async (
   description: string,
   isComplete?: boolean
 ) => {
-  const user = auth.currentUser
-  if (!user) throw new Error('User not authenticated.')
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated.");
 
-  const ref = doc(db, 'tasks', id)
-  const snap = await getDoc(ref)
+  const ref = doc(db, "tasks", id);
+  const snap = await getDoc(ref);
 
-  if (!snap.exists()) throw new Error('Task not found')
+  if (!snap.exists()) throw new Error("Task not found");
 
-  const data = snap.data()
-  if (data.userId !== user.uid) throw new Error('Unauthorized')
+  const data = snap.data();
+  if (data.userId !== user.uid) throw new Error("Unauthorized");
 
   await updateDoc(ref, {
     title,
     description,
-    isComplete: isComplete ?? data.isComplete
-  })
-}
+    isComplete: isComplete ?? data.isComplete,
+  });
+};
 
 export const deleteTask = async (id: string) => {
-  const user = auth.currentUser
-  if (!user) throw new Error('User not authenticated.')
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated.");
 
-  const ref = doc(db, 'tasks', id)
-  const snap = await getDoc(ref)
+  const ref = doc(db, "tasks", id);
+  const snap = await getDoc(ref);
 
-  if (!snap.exists()) throw new Error('Task not found')
-  if (snap.data().userId !== user.uid) throw new Error('Unauthorized')
+  if (!snap.exists()) throw new Error("Task not found");
+  if (snap.data().userId !== user.uid) throw new Error("Unauthorized");
 
-  await deleteDoc(ref)
-}
+  await deleteDoc(ref);
+};
 
 export const completeTask = async (id: string, isComplete: boolean = true) => {
-  const user = auth.currentUser
-  if (!user) throw new Error('User not authenticated.')
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated.");
 
-  const ref = doc(db, 'tasks', id)
-  const snap = await getDoc(ref)
+  const ref = doc(db, "tasks", id);
+  const snap = await getDoc(ref);
 
-  if (!snap.exists()) throw new Error('Task not found')
-  if (snap.data().userId !== user.uid) throw new Error('Unauthorized')
+  if (!snap.exists()) throw new Error("Task not found");
+  if (snap.data().userId !== user.uid) throw new Error("Unauthorized");
 
-  await updateDoc(ref, { isComplete })
-}
+  await updateDoc(ref, { isComplete });
+};
 
 export const getTaskCounts = async () => {
-  const tasks = await getAllTask()
-  const completedCount = tasks.filter(task => task.isComplete).length
-  const pendingCount = tasks.filter(task => !task.isComplete).length
-  return { completedCount, pendingCount }
-}
+  const tasks = await getAllTask();
+  const completedCount = tasks.filter((task) => task.isComplete).length;
+  const pendingCount = tasks.filter((task) => !task.isComplete).length;
+  return { completedCount, pendingCount };
+};
+
+export const getAllTaskByStatus = async (isComplete: boolean) => {
+  const user = auth.currentUser;
+  if (!user) throw new Error("User not authenticated.");
+
+  const q = query(
+    tasksCollection,
+    where("userId", "==", user.uid),
+    where("isComplete", "==", isComplete),
+    orderBy("createdAt", "desc")
+  );
+
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((docSnap) => {
+    const data = docSnap.data();
+    return {
+      id: docSnap.id,
+      title: data.title as string,
+      description: data.description as string,
+      isComplete: (data.isComplete as boolean) || false,
+      createdAt: data.createdAt as string,
+    };
+  });
+};

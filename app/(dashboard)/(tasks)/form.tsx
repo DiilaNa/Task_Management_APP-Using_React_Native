@@ -7,12 +7,12 @@ import {
   Pressable,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react"
 import { MaterialIcons } from "@expo/vector-icons";
 import { useLoader } from "@/hooks/useLoader";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { addTask, updateTask } from "@/services/taskService";
-
+import { addTask, getTaskById, updateTask } from "@/services/taskService";
+import { Task } from "@/types/Task";
 const TaskForm = () => {
   const router = useRouter();
 
@@ -23,25 +23,40 @@ const TaskForm = () => {
 
   const { showLoader, hideLoader, isLoading } = useLoader();
 
+  useEffect(() => {
+    if (taskId) {
+      showLoader();
+      getTaskById(taskId as string)
+        .then((task: Task) => {
+          setTitle(task.title);
+          setDescription(task.description || "");
+        })
+        .catch(() => Alert.alert("Error", "Failed to load task"))
+        .finally(() => hideLoader());
+    }
+  }, [taskId]);
+
+
   const handleSubmit = async () => {
     if (isLoading) return;
 
-    if (!title || !description) {
-      Alert.alert("error", "Please fill all fields");
+    if (!title.trim() || !description.trim()) {
+      Alert.alert("Error", "Please fill all fields");
       return;
     }
 
     showLoader();
     try {
       if (taskId) {
-        // await updateTask(taskId, title, description)
+        await updateTask(taskId as string, title, description);
+        Alert.alert("Success", "Task updated successfully");
       } else {
         await addTask(title, description);
+        Alert.alert("Success", "Task added successfully");
       }
-      Alert.alert("success", taskId ? "Task updated" : "Task added");
       router.back();
     } catch (err: any) {
-      Alert.alert("error", err.message || "Something went wrong");
+      Alert.alert("Error", err.message || "Something went wrong");
     } finally {
       hideLoader();
     }
@@ -79,7 +94,9 @@ const TaskForm = () => {
           className="mb-6 p-4 rounded-xl bg-gray-100 text-gray-800 border border-gray-300 text-base font-medium h-32"
         />
         <Pressable
-          className={`${taskId ? "bg-blue-600/80" : "bg-green-600/80"} px-6 py-3 rounded-2xl`}
+          className={`px-6 py-3 rounded-2xl ${
+            taskId ? "bg-blue-600/80" : "bg-green-600/80"
+          }`}
           onPress={handleSubmit}
         >
           <Text className="text-white text-lg text-center">
