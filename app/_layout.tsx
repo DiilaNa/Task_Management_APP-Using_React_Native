@@ -5,17 +5,21 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";  
+import { LoaderProvider } from "@/context/LoaderContext";
+import { AuthProvider } from "@/context/AuthContext";
 const RootLayout = () => {
   const insets = useSafeAreaInsets();
 
   console.log(insets);
 
   return (
-    // <SafeAreaView className="flex-1">
-    <View style={{ marginTop: insets.top, flex: 1 }}>
-      <Slot />
-    </View>
-    // </SafeAreaView>
+    <LoaderProvider>
+      <AuthProvider>
+        <View style={{ marginTop: insets.top, flex: 1 }}>
+          <Slot />
+        </View>
+      </AuthProvider>
+    </LoaderProvider>
   );
 };
 
